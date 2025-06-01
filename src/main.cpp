@@ -3,12 +3,22 @@ Terminal based spreadsheet program with vim-like bindings
 */
 
 /*  Working On
+*  Colors and cursor navigation work now (you can run program and move the cursor around), but no values actaully work 
+*
+*  still of course need to add file support (saving, and reading)
+*  Long term goals:
+*       - file support (reading and writing)
+*       - formula support
+*       - interface configuration
+*       - keymap config file (able to set keymaps)
+*       - ':' command support
+*           > every action should be mapped to :<some command> and then keymaps should just map to something like <Tab> -> :<command> so that its easily configurable, I'm thinking something like a map.txt file in config/ that has entries like <Tab> : ":command" that the program reads at startup to set keybinds
 *   
-*   Clangd fails when compile_commands.json is not in ncell/, the path is changed in the clangd setup but its not working for some reason
-*   
-*   Also trying to figure out how to get sessions to work so you can just "nvim" in ncell/ and have it open 
-*   the appropriate windows, (1 full height in center, 2 stacked on right for things like headers and second working file)
-*   ^ using auto-session for that one
+*   Reasonable Goals:
+*      -Add writing to cells
+*      -add displaying cells with values (search TODO in displaySheet)
+*
+*  generally search TODO in all files (' fg'), should give you enough of a start
 */
 #include <ncurses.h>
 #include <unordered_map>
@@ -49,8 +59,11 @@ bool startCurses(){
         return false;
     }
 
-         
-
+    curs_set(0);     
+    cbreak();
+    noecho();
+    keypad(stdscr, true);
+    
     return true;
 }
 
@@ -64,27 +77,16 @@ int main(int argc, char* argv[]){
         return 1;
     }
     
-    endwin();
-
     //initialize colors
     curseMap colorMap, colorPairMap;
     loadColors(colorMap, colorPairMap);
 
-/*
-    short r, g, b;
-    color_content(colorMap.at("primaryBG"), &r, &g, &b);
-    std::cout << r << " " << g << " " << b << "\n";
-    return 1;
-*/
-    mvprintw(0,0,"testing colors");
+//    testColors(colorPairMap);
+    Sheet s("my sheet");
+    s.setColors(colorPairMap);
+    
+    s.startMainLoop();
 
-    testColors(colorPairMap);
-//    Sheet s("my sheet");
-//    s.display();
-
-    //mvprintw(0, 0, "press any key to exit...");
-    refresh();
-    getch();
     endwin();
     return 0;
 }

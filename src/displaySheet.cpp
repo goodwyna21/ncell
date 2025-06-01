@@ -1,14 +1,10 @@
 #include <ncurses.h>
 #include <format>
 
+#include "readconfig.h"
 #include "worksheet.h"
 
-namespace DisplayConsts {
-    const int rowIdWidth = 6; //chars in row ids (6 allows for whitespace around up to 9999)
-    const int cellsBeginX = rowIdWidth + 1; //x of first cell
-    const int cellsBeginY = 4; //y of first cell
-    const int defaultColWidth = 10;
-}
+typedef std::unordered_map<std::string, int> cursesMap;
 
 std::string getColId(int n){
     std::string s = "";
@@ -57,7 +53,6 @@ void Sheet::drawHeader(){
     move(2,0);
     //todo
 
-
     //draw column ids
     move(3,DisplayConsts::rowIdWidth);
     int maxX, maxY;
@@ -77,8 +72,19 @@ void Sheet::drawHeader(){
         x += colId.size();
         if(x > maxX){
             colId.resize(colId.size() - (x - maxX));    
+        } 
+       
+        if(ind % 2){
+            attron(COLOR_PAIR(colorPairMap.at("default")));
+        } else {
+            attron(COLOR_PAIR(colorPairMap.at("alternate")));
         }
         printw(colId.c_str());
+        if(ind % 2){
+            attroff(COLOR_PAIR(colorPairMap.at("default")));
+        } else {
+            attroff(COLOR_PAIR(colorPairMap.at("alternate")));
+        }
 
         ind++;
     }
@@ -89,6 +95,61 @@ void Sheet::drawHeader(){
     }
 }
 
+void Sheet::drawCells(){
+    int xPos = DisplayConsts::cellsBeginX;
+    int yPos, colWidth;
+    for(int col = onScreenColBegin; col <= onScreenColEnd; col++){
+        attron(COLOR_PAIR(colorPairMap.at(col%2 ? "default" : "alternate")));
+
+        if(col_widths.find(col) != col_widths.end()){
+            colWidth = col_widths.at(col);
+        } else {
+            colWidth = DisplayConsts::defaultColWidth;
+        }
+        
+        if(cells.find(col) == cells.end()){
+            yPos = DisplayConsts::cellsBeginY;
+            
+            for(int y = onScreenRowBegin; y <= onScreenRowEnd; y++){
+                mvprintw(yPos, xPos, std::string(colWidth, '.').c_str());
+                yPos++;
+            }
+        } else {
+            //TODO draw columns that actually have values
+        }
+
+        attroff(COLOR_PAIR(colorPairMap.at(col%2 ? "default" : "alternate")));
+
+        xPos += colWidth;
+    }  
+}
+
+void Sheet::drawCell(int row, int col, bool selected){
+    int xPos = DisplayConsts::cellsBeginX;
+    int colWidth;
+    for(int colInd = onScreenColBegin; colInd < col; colInd++){
+        if(col_widths.find(colInd) != col_widths.end()){
+            colWidth = col_widths.at(colInd);
+        } else {
+            colWidth = DisplayConsts::defaultColWidth;
+        }
+        xPos += colWidth;
+    }
+    if(selected){
+        attron(COLOR_PAIR(colorPairMap.at("primary")));
+    } else {
+        attron(COLOR_PAIR(colorPairMap.at(col%2 ? "default" : "alternate")));
+    }
+    mvprintw(row + DisplayConsts::cellsBeginY, xPos, std::string(DisplayConsts::defaultColWidth, '.').c_str());
+    if(selected){
+        attroff(COLOR_PAIR(colorPairMap.at("primary")));
+    } else {
+        attroff(COLOR_PAIR(colorPairMap.at(col%2 ? "default" : "alternate")));
+    }
+}
+
 void Sheet::display(){
     drawHeader();
+    drawCells();
+    drawCell(cursRow, cursCol, true);
 }
