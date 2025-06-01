@@ -1,0 +1,17 @@
+primaryBG #ff52ad
+defBG #27272a
+defFG #fafafa
+altBG #69696e
+destructiveBG #320008
+destructiveFG #ff7563
+
+ring #e980a3
+complement_1 #50bba7
+complement_2 #60afe3
+complement_3 #c2a249
+complement_4 #8ca3ea
+;
+primary defFG primaryBG
+default defFG defBG
+alternate defFG altBG
+destructive destructiveFG destructiveBG
