@@ -53,15 +53,14 @@ bool loadColors(curseMap& colorMap, curseMap& colorPairMap){
     }
 
     //read colors
-    std::unordered_map<std::string, std::tuple<short, short, short>> colDefs; //primaryBG -> {1000, 321, 678} or whatever
-    std::unordered_map<std::string, std::pair<std::string, std::string>> colPairDefs; //primary -> {defFG, primaryBG}
-
     std::string line, name, p1, p2;
     char hexDelim;
     short r, g, b;
     std::istringstream linestream;
     bool inColDefs = true;
-    
+    short colorId = 16;
+    short pairId = 1;
+
     while(std::getline(colFile, line)){
         //empty line
         if(line.find_first_not_of(' ') == std::string::npos){
@@ -88,44 +87,24 @@ bool loadColors(curseMap& colorMap, curseMap& colorPairMap){
             g = static_cast<short>(std::stoi(p1.substr(2,2), nullptr, 16) * 1000 / 255);
             b = static_cast<short>(std::stoi(p1.substr(4,2), nullptr, 16) * 1000 / 255);
             
-            colDefs.insert({name, std::make_tuple(r, g, b)});
-        
+            init_color(colorId, r, g, b);
+            colorMap.insert({name, colorId});
+            colorId++;
+
+            #ifdef DEBUG_COLOR
+            std::cout << name << ": " << r << ", " << g << ", " << b << "\n";
+            #endif
+
         //color pair definitions
         } else {
             linestream.clear();
             linestream.str(line);
             linestream >> name >> p1 >> p2;
 
-            colPairDefs.insert({name, std::make_pair(p1, p2)});
+            init_pair(pairId, colorMap.at(p1), colorMap.at(p2));
+            colorPairMap.insert({name, pairId});
+            pairId++;
         }
-    }
-
-    //debug
-    #ifdef DEBUG_COLOR
-    std::cout << "colors: \n";
-    for(const auto & [key, value] : colDefs){
-        std::cout << key << ": " << std::get<0>(value) << ", " << std::get<1>(value) << ", " << std::get<2>(value) << "\n";
-    }
-    std::cout << "pairs: \n";
-    for(const auto & [key, value] : colPairDefs){
-        std::cout << key << ": " << std::get<0>(value) << ", " << std::get<1>(value) << "\n";
-    }
-    #endif
-
-
-    //initialize colors
-    int colorId = 10;
-    for(const auto & [colorName, rgb] : colDefs){
-        init_color(colorId, std::get<0>(rgb), std::get<0>(rgb), std::get<0>(rgb)); 
-        colorMap.insert({colorName, colorId});
-        colorId++;
-    }
-
-    int pairId = 1;
-    for(const auto & [pairName, colors] : colPairDefs){
-        init_pair(pairId, colorMap.at(std::get<0>(colors)), colorMap.at(std::get<1>(colors)));
-        colorPairMap.insert({pairName, pairId});
-        pairId++;
     }
 
     return true;
@@ -133,12 +112,12 @@ bool loadColors(curseMap& colorMap, curseMap& colorPairMap){
 
 //display test colors to screen
 void testColors(curseMap& colorPairMap){
-    move(0,0);
+    move(1,0);
     for(const auto & [pairName, pairId] : colorPairMap){
-        attron(pairId);
+        attron(COLOR_PAIR(pairId));
         printw(pairName.c_str());
         printw("\n");
-        attroff(pairId);
+        attroff(COLOR_PAIR(pairId));
     }
     refresh();
 }

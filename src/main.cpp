@@ -12,9 +12,14 @@ Terminal based spreadsheet program with vim-like bindings
 */
 #include <ncurses.h>
 #include <unordered_map>
+#include <iostream>
+
+
 #include "enums.h"
 #include "worksheet.h"
 #include "readconfig.h"
+
+
 
 /*
 *   Working on
@@ -28,22 +33,19 @@ Terminal based spreadsheet program with vim-like bindings
 bool startCurses(){
      initscr();
     if (!has_colors()) {
-        endwin();
-        printf("No color support\n");
+        printw("No color support\n");
         return false;
     } 
     start_color();
     if (!can_change_color()) {
-        endwin();
-        printf("Cannot change colors\n");
+        printw("Cannot change colors\n");
         return false;
     }
 
-    use_default_colors();   // Allow use of default terminal background
+    //use_default_colors();   // Allow use of default terminal background
 
     if (COLORS < 256) {
-        endwin();
-        printf("Your terminal does not support 256 colors\n");
+        printw("Your terminal does not support 256 colors\n");
         return false;
     }
 
@@ -56,12 +58,25 @@ typedef std::unordered_map<std::string, int> curseMap;
 
 int main(int argc, char* argv[]){
     if(!startCurses()){
+        refresh();
+        getch();
+        endwin();
         return 1;
     }
+    
+    endwin();
 
     //initialize colors
     curseMap colorMap, colorPairMap;
     loadColors(colorMap, colorPairMap);
+
+/*
+    short r, g, b;
+    color_content(colorMap.at("primaryBG"), &r, &g, &b);
+    std::cout << r << " " << g << " " << b << "\n";
+    return 1;
+*/
+    mvprintw(0,0,"testing colors");
 
     testColors(colorPairMap);
 //    Sheet s("my sheet");
