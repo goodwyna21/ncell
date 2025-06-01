@@ -1,6 +1,7 @@
-build/*
-.vscode/*
+build/
+!build/.gitkeep
+.vscode/
 .vscode
-.cache/*
+.cache/
 .cache
 compile_commands.json
