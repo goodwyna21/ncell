@@ -1,6 +1,8 @@
 #ifndef ENUM_DEF_H
 #define ENUM_DEF_H
 
+// IWYU pragma: private; include "enums.h"
+
 #include <string>
 
 struct cell{

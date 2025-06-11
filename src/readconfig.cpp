@@ -1,8 +1,7 @@
-#include <iomanip>
 #include <sstream>
 #include <fstream>
-#include <iostream>
 #include <tuple>
+
 #include <ncurses.h>
 
 #include "readconfig.h"
@@ -13,15 +12,15 @@
 #include <filesystem>
 #endif
 
-typedef std::unordered_map<std::string, int> curseMap;
+std::vector<std::string> CONFIG_PATH = {
+    "~/.config/ncell/",
+    "../../config/",
+    "../config/"
+};
 
 //loads colors from colors.txt file, initializes pairs and puts those pairs into col_map
-bool loadColors(curseMap& colorMap, curseMap& colorPairMap){
-    std::vector<std::string> path = {
-        "~/.config/ncell/",
-        "../../config/",
-        "../config/"
-    };
+errType loadColors(curseMap& colorMap, curseMap& colorPairMap){
+    
 
     //try and open colors.txt
     std::ifstream colFile;
@@ -30,7 +29,7 @@ bool loadColors(curseMap& colorMap, curseMap& colorPairMap){
     std::cout << std::filesystem::current_path() << "\n";
     #endif
 
-    for(std::string pathOption : path){
+    for(std::string pathOption : CONFIG_PATH){
         #ifdef DEBUG_COLOR
         std::cout << "trying " << std::quoted(pathOption + "colors.txt") << "... ";
         #endif
@@ -48,8 +47,7 @@ bool loadColors(curseMap& colorMap, curseMap& colorPairMap){
     }
     //check if none found
     if(!colFile.is_open()){
-        std::cerr << "no valid colors.txt found\n";
-        return false;
+        return "no valid colors.txt found\n";
     }
 
     //read colors
@@ -107,7 +105,7 @@ bool loadColors(curseMap& colorMap, curseMap& colorPairMap){
         }
     }
 
-    return true;
+    return {};
 }
 
 //display test colors to screen
@@ -122,4 +120,35 @@ void testColors(curseMap& colorPairMap){
     refresh();
 }
 
+errType loadKeymap(keymapMap& keymap){
+    std::ifstream keyFile;
 
+    for(std::string pathOption : CONFIG_PATH){
+        keyFile.open(pathOption + "keymap.txt");
+        if(keyFile.is_open()){ 
+            break;
+        }
+    }
+    if(!keyFile.is_open()){
+        return "No keymap file found\n";   
+    }
+
+    std::istringstream linestream;
+    std::string line;
+    std::string sequence;
+    std::string action;
+
+    while(std::getline(keyFile, line)){
+        if(line.find_first_not_of(' ') == std::string::npos){
+            continue;
+        }
+        linestream.clear();
+        linestream.str(line);
+
+        std::getline(linestream, sequence, ' ');
+        std::getline(linestream, action);
+
+        keymap.insert({sequence, action});
+    }
+    return {};
+}

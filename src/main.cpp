@@ -15,17 +15,17 @@ Terminal based spreadsheet program with vim-like bindings
 *           > every action should be mapped to :<some command> and then keymaps should just map to something like <Tab> -> :<command> so that its easily configurable, I'm thinking something like a map.txt file in config/ that has entries like <Tab> : ":command" that the program reads at startup to set keybinds
 *   
 *   Reasonable Goals:
-*      -Add writing to cells
-*      -add displaying cells with values (search TODO in displaySheet)
+*      - Add writing to cells
+*      - add more commands, like insert, change, which will allow you to change the values in cells
+*      - add displaying cells with values (search TODO in displaySheet)
+*
+*   Just finished:
+*       - Keymap loading works
 *
 *  generally search TODO in all files (' fg'), should give you enough of a start
 */
 #include <ncurses.h>
 #include <unordered_map>
-#include <iostream>
-
-
-#include "enums.h"
 #include "worksheet.h"
 #include "readconfig.h"
 
@@ -52,8 +52,6 @@ bool startCurses(){
         return false;
     }
 
-    //use_default_colors();   // Allow use of default terminal background
-
     if (COLORS < 256) {
         printw("Your terminal does not support 256 colors\n");
         return false;
@@ -79,14 +77,41 @@ int main(int argc, char* argv[]){
     
     //initialize colors
     curseMap colorMap, colorPairMap;
-    loadColors(colorMap, colorPairMap);
+    errType ret = loadColors(colorMap, colorPairMap);
+
+    if(!ret.success){
+        printw("Failed to load colors, \"");
+        printw(ret.errMessage.c_str());
+        printw("\"\n");
+        refresh();
+        getch();
+        endwin();
+        return 1;
+    }
+
+    //initialize keymaps
+    keymapMap keymap;
+    ret = loadKeymap(keymap);
+
+    if(!ret.success){
+        printw("Failed to load keymap, \"");
+        printw(ret.errMessage.c_str());
+        printw("\"\n");
+        refresh();
+        getch();
+        endwin();
+        return 1;
+    }
+
 
 //    testColors(colorPairMap);
     Sheet s("my sheet");
     s.setColors(colorPairMap);
     
-    s.startMainLoop();
+
+    s.startMainLoop(keymap);
 
     endwin();
+
     return 0;
 }

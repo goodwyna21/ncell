@@ -1,25 +1,30 @@
 #include "worksheet.h"
+
 #include <ncurses.h>
 
-void Sheet::startMainLoop(){
+
+void Sheet::startMainLoop(const keymapMap& keymap){
     display();
 
     char inp;
+    std::string sequence;
+    std::string action;
     while((inp = getch()) != 'q'){
-        switch(inp){
-            case 'h':
-                mvCurs(-1, 0);
-                break;
-            case 'l':
-                mvCurs(1, 0);
-                break;
-            case 'j':
-                mvCurs(0, 1);
-                break;
-            case 'k':
-                mvCurs(0, -1);
-                break;
+        sequence = std::string(1, inp);
+
+        if(keymap.find(sequence) == keymap.end()){
+            continue;
+        }
+        action = keymap.at(sequence);
+
+        if(action == "curs_left"){
+            mvCurs(-1, 0);
+        } else if(action == "curs_right"){
+            mvCurs(1, 0);
+        } else if(action == "curs_down"){
+            mvCurs(0, 1);
+        } else if(action == "curs_up"){
+            mvCurs(0, -1);
         }
     }
-    
 }

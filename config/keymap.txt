@@ -1,0 +1,12 @@
+h curs_left
+l curs_right
+j curs_down
+k curs_up
+i insert
+x change
+/ regex
+: <command>,
+<space> <leader>
+
+<command>w write
+<command>q quit

@@ -8,6 +8,7 @@
 typedef std::unordered_map<int, std::shared_ptr<cell>> column;
 typedef std::unordered_map<int, column> cellMap;
 typedef std::unordered_map<std::string, int> cursesMap;
+typedef std::unordered_map<std::string, std::string> keymapMap;
 
 namespace DisplayConsts {
     const int rowIdWidth = 5; //chars in row ids (6 allows for whitespace around up to 9999)
@@ -22,7 +23,7 @@ public:
     Sheet(); //done
 
     void setColors(cursesMap& _colorPairMap); //done
-    void startMainLoop();
+    void startMainLoop(const keymapMap& keymap);
 
 private:
     void display(); //done-ish
@@ -50,6 +51,7 @@ private:
     int onScreenColBegin;
     int onScreenColEnd;
     int onScreenRowBegin;
+
     int onScreenRowEnd;
     std::unordered_map<int, int> col_widths;
     cursesMap colorPairMap;

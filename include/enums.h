@@ -1,6 +1,6 @@
 #ifndef ENUMS_H
 #define ENUMS_H
-#include "enum_definitions.h"
+#include "enum_definitions.h" // IWYU pragma: export
 #include <ostream>
 
 namespace enumPrints{

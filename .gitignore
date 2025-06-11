@@ -4,4 +4,7 @@ build/
 .vscode
 .cache/
 .cache
+tools/test.cpp
+tools/test.o
+
 compile_commands.json
