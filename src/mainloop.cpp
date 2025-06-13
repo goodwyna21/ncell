@@ -2,7 +2,9 @@
 
 #include <ncurses.h>
 
-
+void Sheet::editCellText(std::string startText){
+    return; //todo, add interactive typing into cells
+};
 
 void Sheet::startMainLoop(const keymapMap& keymap){
     display();

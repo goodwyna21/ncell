@@ -17,7 +17,10 @@ const std::unordered_map<std::string, Sheet::sheetActionFunction> Sheet::actionM
     {"curs_left", &Sheet::cursLeft},
     {"curs_right", &Sheet::cursRight},
     {"curs_up", &Sheet::cursUp},
-    {"curs_down", &Sheet::cursDown}
+    {"curs_down", &Sheet::cursDown},
+    {"delete_cell", &Sheet::deleteCell},
+    {"append_cell", &Sheet::appendCellText},
+    {"overwrite_cell", &Sheet::overwriteCellText}
 };
 
 void Sheet::setColors(cursesMap& _colorPairMap){
@@ -41,7 +44,7 @@ bool isNumber(const std::string& s) {
     double d;
     char c;
 
-    // Try to read a double, and make sure the entire string was consumed
+ // Try to read a double, and make sure the entire string was consumed
     return iss >> d && !(iss >> c);
 }
 
@@ -78,7 +81,15 @@ void Sheet::set(int row, int col, const std::string& value){
         }
     }
 }
- 
+
+std::string Sheet::getText(int row, int col){
+    std::shared_ptr<cell> c = at(row, col);
+    if(c == nullptr){
+        return "";
+    } 
+    return c->value;
+}
+
 void Sheet::setCurs(int row, int col){
     drawCell(cursRow, cursCol);
     cursRow = row;
@@ -92,4 +103,13 @@ void Sheet::mvCurs(int dx, int dy){
         return; //TODO scroll screen when this happens
     }
     setCurs(cursRow + dy, cursCol + dx);
+}
+
+void Sheet::deleteCell(){
+    std::shared_ptr<cell> c = at(cursRow, cursCol);
+    if(c == nullptr){ return; }
+    cells.at(cursCol).erase(cursRow);
+    if(cells.at(cursCol).empty()){
+        cells.erase(cursCol);
+    }
 }

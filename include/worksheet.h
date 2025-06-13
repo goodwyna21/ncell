@@ -30,22 +30,35 @@ private:
 
     std::shared_ptr<cell> at(int, int); //done
     void set(int, int, const std::string&); //done-ish
+    std::string getText(int, int);
+
+    void editCellText(std::string startText=""); //todo
 
     using sheetActionFunction = void (Sheet::*)();
     static const std::unordered_map<std::string, sheetActionFunction> actionMap;  
 
+    // ---- actions ----
     void setCurs(int col, int row); //done
     void mvCurs(int dx, int dy); //done
     void cursUp() {mvCurs(0, -1); }
     void cursDown() {mvCurs(0, 1); }
     void cursLeft() {mvCurs(-1, 0); }
     void cursRight() {mvCurs(1, 0); }
+
+    void deleteCell();  
+    void overwriteCellText(){ editCellText(); }
+    void appendCellText(){ editCellText(getText(cursRow, cursCol)); }
+
 /*
     void insertRow(int);
     void insertCol(int);
     void deleteRow(int);
     void deleteCol(int);
 */
+
+    // ---- end actions ----
+
+
 
 //    void updateWidth(int);
     cellMap cells; //cells[col][row]

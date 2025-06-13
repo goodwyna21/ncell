@@ -15,12 +15,14 @@ Terminal based spreadsheet program with vim-like bindings
 *           > every action should be mapped to :<some command> and then keymaps should just map to something like <Tab> -> :<command> so that its easily configurable, I'm thinking something like a map.txt file in config/ that has entries like <Tab> : ":command" that the program reads at startup to set keybinds
 *   
 *   Reasonable Goals:
-*      - Add writing to cells
-*      - add more commands, like insert, change, which will allow you to change the values in cells
+*      - Add writing to cells (!!!)
+*           - implement Sheet::editCellText in mainloop.cpp
+*      - add more commands, like insert, change, which will allow you to change the values in cells, this is partly implemented (the action functions exist) but there Sheet::editCellText remains to be implemented
 *      - add displaying cells with values (search TODO in displaySheet)
 *
 *   Just finished:
 *       - Keymap loading works
+*       - action functions added
 *
 *  generally search TODO in all files (' fg'), should give you enough of a start
 */
