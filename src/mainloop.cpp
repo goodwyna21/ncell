@@ -3,6 +3,7 @@
 #include <ncurses.h>
 
 
+
 void Sheet::startMainLoop(const keymapMap& keymap){
     display();
 
@@ -17,14 +18,11 @@ void Sheet::startMainLoop(const keymapMap& keymap){
         }
         action = keymap.at(sequence);
 
-        if(action == "curs_left"){
-            mvCurs(-1, 0);
-        } else if(action == "curs_right"){
-            mvCurs(1, 0);
-        } else if(action == "curs_down"){
-            mvCurs(0, 1);
-        } else if(action == "curs_up"){
-            mvCurs(0, -1);
+        if(actionMap.find(action) != actionMap.end()){
+            (this->*actionMap.at(action))();
+        } else {
+            //do something if action not found
+            continue;
         }
     }
 }

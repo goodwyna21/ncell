@@ -13,6 +13,13 @@ Sheet::Sheet(std::string _name) : name(_name) {
 }
 Sheet::Sheet() : Sheet("unnamed sheet") {}
 
+const std::unordered_map<std::string, Sheet::sheetActionFunction> Sheet::actionMap = {
+    {"curs_left", &Sheet::cursLeft},
+    {"curs_right", &Sheet::cursRight},
+    {"curs_up", &Sheet::cursUp},
+    {"curs_down", &Sheet::cursDown}
+};
+
 void Sheet::setColors(cursesMap& _colorPairMap){
     colorPairMap = _colorPairMap;
     colorsSet = true;

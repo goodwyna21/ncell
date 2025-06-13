@@ -6,7 +6,6 @@
 
 typedef std::unordered_map<std::string, int> curseMap;
 typedef std::unordered_map<std::string, std::string> keymapMap;
-
 struct errType {
     bool success = true;
     std::string errMessage = "";  
